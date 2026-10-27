@@ -1,0 +1,11 @@
+id,name,department,salary,age
+1,Alice,Engineering,95000.0,30
+2,Bob,Marketing,75000.0,28
+3,Carol,Engineering,105000.0,35
+4,Dave,HR,65000.0,42
+5,Eve,Engineering,88000.0,27
+6,Frank,Marketing,82000.0,33
+7,Grace,HR,70000.0,38
+8,Henry,Engineering,115000.0,45
+9,Iris,Marketing,79000.0,29
+10,Jack,HR,68000.0,36

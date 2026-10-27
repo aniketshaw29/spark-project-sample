@@ -1,0 +1,12 @@
+{"id": 1, "product": "Laptop", "amount": 1200.0, "region": "North", "quarter": "Q1"}
+{"id": 2, "product": "Phone", "amount": 800.0, "region": "South", "quarter": "Q1"}
+{"id": 3, "product": "Tablet", "amount": 600.0, "region": "East", "quarter": "Q1"}
+{"id": 4, "product": "Laptop", "amount": 1300.0, "region": "West", "quarter": "Q1"}
+{"id": 5, "product": "Monitor", "amount": 450.0, "region": "North", "quarter": "Q2"}
+{"id": 6, "product": "Phone", "amount": 850.0, "region": "South", "quarter": "Q2"}
+{"id": 7, "product": "Laptop", "amount": 1100.0, "region": "East", "quarter": "Q2"}
+{"id": 8, "product": "Tablet", "amount": 580.0, "region": "West", "quarter": "Q2"}
+{"id": 9, "product": "Monitor", "amount": 470.0, "region": "North", "quarter": "Q3"}
+{"id": 10, "product": "Laptop", "amount": 1250.0, "region": "South", "quarter": "Q3"}
+{"id": 11, "product": "Phone", "amount": 900.0, "region": "East", "quarter": "Q3"}
+{"id": 12, "product": "Tablet", "amount": 620.0, "region": "West", "quarter": "Q3"}

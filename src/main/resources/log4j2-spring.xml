@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    log4j2-spring.xml — Spring Boot picks this up automatically when spring-boot-starter-log4j2 is on the classpath.
+
+    Without this, Spark prints hundreds of INFO lines on startup (partition counts,
+    executor initialisation, plan generation, etc.) which obscures your app's own logs.
+    Setting org.apache.spark and org.apache.hadoop to WARN keeps the output clean
+    while still surfacing actual warnings/errors from Spark internals.
+-->
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%logger{36}] %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <!-- Suppress Spark's verbose startup output -->
+        <Logger name="org.apache.spark" level="WARN" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <!-- Suppress Hadoop's verbose output (Spark uses Hadoop internally) -->
+        <Logger name="org.apache.hadoop" level="WARN" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <!-- Suppress Parquet log noise -->
+        <Logger name="org.apache.parquet" level="WARN" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <!-- Our app + Spring at INFO -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
