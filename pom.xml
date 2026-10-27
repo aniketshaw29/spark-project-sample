@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <spark.version>3.5.1</spark.version>
+        <spark.version>3.5.8</spark.version>
     </properties>
 
     <dependencies>
