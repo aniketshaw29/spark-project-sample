@@ -3,7 +3,9 @@ package com.example.spark.controller;
 import com.example.spark.model.Employee;
 import com.example.spark.service.DataFrameService;
 import com.example.spark.service.DatasetService;
+import com.example.spark.service.JoinService;
 import com.example.spark.service.RddService;
+import com.example.spark.service.WindowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,16 @@ import java.util.*;
  *   GET /api/spark/dataset/high-earners?minSalary=80000   FilterFunction<Employee>
  *   GET /api/spark/dataset/summaries                       MapFunction<Employee, String>
  *   GET /api/spark/dataset/highest-paid                    ReduceFunction<Employee>
+ *
+ * Join endpoints:
+ *   GET /api/spark/joins/inner    inner join employees + departments
+ *   GET /api/spark/joins/left     left join (nulls for unmatched dept)
+ *   GET /api/spark/joins/anti     departments with no employees (left_anti)
+ *
+ * Window function endpoints:
+ *   GET /api/spark/window/ranks          rank / dense_rank / row_number per dept
+ *   GET /api/spark/window/running-total  cumulative salary sum per dept
+ *   GET /api/spark/window/lag-lead       prev/next salary + diff within dept
  */
 @RestController
 @RequestMapping("/api/spark")
@@ -35,13 +47,19 @@ public class SparkController {
     private final RddService rddService;
     private final DataFrameService dataFrameService;
     private final DatasetService datasetService;
+    private final JoinService joinService;
+    private final WindowService windowService;
 
     public SparkController(RddService rddService,
                            DataFrameService dataFrameService,
-                           DatasetService datasetService) {
+                           DatasetService datasetService,
+                           JoinService joinService,
+                           WindowService windowService) {
         this.rddService = rddService;
         this.dataFrameService = dataFrameService;
         this.datasetService = datasetService;
+        this.joinService = joinService;
+        this.windowService = windowService;
     }
 
     // ── RDD endpoints ─────────────────────────────────────────────────────────
@@ -141,5 +159,57 @@ public class SparkController {
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "ok", "spark_mode", "local[*]"));
+    }
+
+    // ── Join endpoints ────────────────────────────────────────────────────────
+
+    @GetMapping("/joins/inner")
+    public ResponseEntity<Map<String, Object>> innerJoin() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Inner join: only employees whose department exists in departments.csv");
+        response.put("results", joinService.innerJoin());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/joins/left")
+    public ResponseEntity<Map<String, Object>> leftJoin() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Left join: all employees kept; budget/location null when dept has no matching row");
+        response.put("results", joinService.leftJoin());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/joins/anti")
+    public ResponseEntity<Map<String, Object>> antiJoin() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Left anti join: departments that have zero employees");
+        response.put("results", joinService.antiJoin());
+        return ResponseEntity.ok(response);
+    }
+
+    // ── Window function endpoints ─────────────────────────────────────────────
+
+    @GetMapping("/window/ranks")
+    public ResponseEntity<Map<String, Object>> windowRanks() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Window rank(): partition by dept, order by salary desc — rank/dense_rank/row_number");
+        response.put("results", windowService.rankByDept());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/window/running-total")
+    public ResponseEntity<Map<String, Object>> runningTotal() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Window sum() over rowsBetween(unboundedPreceding, currentRow): cumulative salary per dept");
+        response.put("results", windowService.runningTotal());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/window/lag-lead")
+    public ResponseEntity<Map<String, Object>> lagLead() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("concept", "Window lag()/lead(): prev/next salary within dept; null at partition boundaries");
+        response.put("results", windowService.lagLead());
+        return ResponseEntity.ok(response);
     }
 }
